@@ -4,9 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/MikelSot/amaris-beer/domain/beer"
+	"github.com/MikelSot/amaris-beer/domain/beerview"
 	"github.com/MikelSot/amaris-beer/insfrastructure/handler/response"
 	beerStorage "github.com/MikelSot/amaris-beer/insfrastructure/postgres/beer"
 	"github.com/MikelSot/amaris-beer/insfrastructure/postgres/transaction"
+	"github.com/MikelSot/amaris-beer/insfrastructure/redis"
 	"github.com/MikelSot/amaris-beer/model"
 )
 
@@ -26,7 +28,12 @@ func buildHandler(spec model.RouterSpecification) handler {
 	tx := transaction.Transaction{}
 	storage := beerStorage.New(spec.DB)
 
-	useCase := beer.New(storage, tx)
+	cache := redis.NewRedis(spec.Redis)
+	stream := redis.NewStream(spec.Redis, spec.StreamName)
+
+	beerViewUseCase := beerview.New(cache, stream, spec.Threshold)
+
+	useCase := beer.New(storage, tx, beerViewUseCase)
 
 	return newHandler(useCase, response)
 }

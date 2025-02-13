@@ -15,7 +15,6 @@ var _fieldInserts = []string{
 	"name",
 	"price",
 	"description",
-	"view_count",
 }
 
 var _fieldsSelect = []string{
@@ -49,7 +48,6 @@ func (b Beer) Create(ctx context.Context, m *model.Beer) error {
 		m.Name,
 		m.Price,
 		repository.StringToNull(m.Description),
-		m.ViewCount,
 	).Scan(&m.ID, &m.CreatedAt)
 	if err != nil {
 		return err
@@ -65,7 +63,6 @@ func (b Beer) Update(ctx context.Context, m model.Beer) error {
 		m.Name,
 		m.Price,
 		repository.StringToNull(m.Description),
-		m.ViewCount,
 		m.ID,
 	)
 	if err != nil {
@@ -134,7 +131,6 @@ func (b Beer) scanRow(row pgx.Row) (model.Beer, error) {
 		&m.Name,
 		&m.Price,
 		&descriptionNull,
-		&m.ViewCount,
 		&m.ID,
 		&m.CreatedAt,
 		&m.UpdatedAt,

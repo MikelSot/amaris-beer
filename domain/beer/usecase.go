@@ -3,20 +3,23 @@ package beer
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/MikelSot/repository"
 
+	"github.com/MikelSot/amaris-beer/domain/beerview"
 	"github.com/MikelSot/amaris-beer/model"
 )
 
 type Beer struct {
-	storage Storage
-	tx      Tx
+	storage  Storage
+	tx       Tx
+	beerView beerview.UseCase
 }
 
-func New(s Storage, tx Tx) Beer {
-	return Beer{s, tx}
+func New(s Storage, tx Tx, bv beerview.UseCase) Beer {
+	return Beer{s, tx, bv}
 }
 
 func (b Beer) Create(ctx context.Context, m *model.Beer) error {
@@ -95,6 +98,8 @@ func (b Beer) GetByID(ctx context.Context, ID uint) (model.Beer, error) {
 		return model.Beer{}, fmt.Errorf("beer: %w", err)
 	}
 
+	b.processBeerView(ctx, ID)
+
 	return beer, nil
 }
 
@@ -149,6 +154,25 @@ func (b Beer) getByName(ctx context.Context, name string) (model.Beer, error) {
 	}
 
 	return beer, nil
+}
+
+func (b Beer) processBeerView(ctx context.Context, beerID uint) {
+	_, err := b.beerView.Increment(ctx, beerID)
+	if err != nil {
+		log.Printf("error incrementing beer view: %v", err)
+	}
+
+	if !b.beerView.IsHighDemandReached(ctx, beerID) {
+		return
+	}
+
+	if err := b.beerView.PublishHighDemand(ctx, beerID); err != nil {
+		log.Printf("error publishing high demand: %v", err)
+	}
+
+	if err := b.beerView.ResetViewCounter(ctx, beerID); err != nil {
+		log.Printf("error reseting view counter: %v", err)
+	}
 }
 
 func (b Beer) errorConstraint(err error) error {
