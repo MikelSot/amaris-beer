@@ -17,3 +17,12 @@ func NewRedisConfig() RedisConfig {
 		Password: os.Getenv("REDIS_PASSWORD"),
 	}
 }
+
+func NewStreamConfig() RedisConfig {
+	return RedisConfig{
+		Host:     os.Getenv("STREAM_HOST"),
+		Port:     os.Getenv("STREAM_PORT"),
+		Name:     os.Getenv("STREAM_DB"),
+		Password: os.Getenv("STREAM_PASSWORD"),
+	}
+}

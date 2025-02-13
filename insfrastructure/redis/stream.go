@@ -21,10 +21,10 @@ func NewStream(client *redis.Client, streamName string) Stream {
 	}
 }
 
-func (s Stream) Publish(ctx context.Context, event model.Event, body []byte) error {
+func (s Stream) Publish(ctx context.Context, event model.Event, beerId []byte, currentPrice []byte) error {
 	if err := s.client.XAdd(ctx, &redis.XAddArgs{
 		Stream: s.streamName,
-		Values: map[model.Event]interface{}{"event": event, "beer_id": body},
+		Values: map[string]interface{}{"event": string(event), "beer_id": beerId, "current_price": currentPrice},
 	}).Err(); err != nil {
 		return err
 	}

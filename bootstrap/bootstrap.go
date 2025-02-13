@@ -20,10 +20,13 @@ func Run(boot []byte) {
 	steamName := getStreamName()
 
 	dbConfig := model.NewDatabaseConfig()
-	db := newDatabase(ctx, dbConfig, applicationName)
+	db, txDb := newDatabase(ctx, dbConfig, applicationName)
+
+	streamConfig := model.NewStreamConfig()
+	stream := newRedisClient(ctx, streamConfig)
 
 	redisConfig := model.NewRedisConfig()
-	redis := NewRedisClient(ctx, redisConfig)
+	redis := newRedisClient(ctx, redisConfig)
 
 	ginEntry := newGinEntry(boot)
 	ginEntry.Bootstrap(ctx)
@@ -36,9 +39,11 @@ func Run(boot []byte) {
 		Api:        api,
 		Logger:     logger,
 		DB:         db,
+		TxDB:       txDb,
 		Redis:      redis,
-		Threshold:  threshold,
+		Stream:     stream,
 		StreamName: steamName,
+		Threshold:  threshold,
 	})
 
 	rkentry.GlobalAppCtx.WaitForShutdownSig()

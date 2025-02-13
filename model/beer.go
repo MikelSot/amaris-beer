@@ -1,12 +1,14 @@
 package model
 
+import "time"
+
 type Beer struct {
-	ID          uint    `json:"id"`
-	Name        string  `json:"name"`
-	Price       float64 `json:"price"`
-	Description string  `json:"description"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
+	ID          uint      `json:"id"`
+	Name        string    `json:"name"`
+	Price       float64   `json:"price"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type Beers []Beer

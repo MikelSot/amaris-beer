@@ -19,7 +19,7 @@ config:
   - name: default-config
 gin:
   - name: service-gin
-    port: 8080
+    port: 3001
     enabled: true
     commonService:
       enabled: true

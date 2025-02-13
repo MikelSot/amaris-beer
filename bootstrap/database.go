@@ -10,7 +10,7 @@ import (
 	"github.com/MikelSot/amaris-beer/model"
 )
 
-func newDatabase(ctx context.Context, dbConfig model.DatabaseConfig, applicationName string) model.PgxPool {
+func newDatabase(ctx context.Context, dbConfig model.DatabaseConfig, applicationName string) (model.PgxPool, *pgxpool.Pool) {
 	connString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.Name, dbConfig.SSLMode)
 
@@ -30,5 +30,5 @@ func newDatabase(ctx context.Context, dbConfig model.DatabaseConfig, application
 		log.Fatalf("could ping database, err: %v", err)
 	}
 
-	return db
+	return db, db
 }

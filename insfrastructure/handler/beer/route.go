@@ -1,8 +1,6 @@
 package beer
 
 import (
-	"github.com/gin-gonic/gin"
-
 	"github.com/MikelSot/amaris-beer/domain/beer"
 	"github.com/MikelSot/amaris-beer/domain/beerview"
 	"github.com/MikelSot/amaris-beer/insfrastructure/handler/response"
@@ -10,6 +8,7 @@ import (
 	"github.com/MikelSot/amaris-beer/insfrastructure/postgres/transaction"
 	"github.com/MikelSot/amaris-beer/insfrastructure/redis"
 	"github.com/MikelSot/amaris-beer/model"
+	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -25,11 +24,11 @@ func NewRouter(spec model.RouterSpecification) {
 func buildHandler(spec model.RouterSpecification) handler {
 	response := response.New(spec.Logger)
 
-	tx := transaction.Transaction{}
+	tx := transaction.New(spec.TxDB)
 	storage := beerStorage.New(spec.DB)
 
 	cache := redis.NewRedis(spec.Redis)
-	stream := redis.NewStream(spec.Redis, spec.StreamName)
+	stream := redis.NewStream(spec.Stream, spec.StreamName)
 
 	beerViewUseCase := beerview.New(cache, stream, spec.Threshold)
 

@@ -11,7 +11,7 @@ type UseCase interface {
 	ResetViewCounter(ctx context.Context, beerID uint) error
 	IsHighDemandReached(ctx context.Context, beerID uint) bool
 
-	PublishHighDemand(ctx context.Context, beerID uint) error
+	PublishHighDemand(ctx context.Context, beer model.Beer) error
 }
 
 type RedisService interface {
@@ -21,5 +21,5 @@ type RedisService interface {
 }
 
 type StreamService interface {
-	Publish(ctx context.Context, event model.Event, body []byte) error
+	Publish(ctx context.Context, event model.Event, beerId []byte, currentPrice []byte) error
 }

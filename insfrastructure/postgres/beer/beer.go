@@ -126,6 +126,7 @@ func (b Beer) scanRow(row pgx.Row) (model.Beer, error) {
 	m := model.Beer{}
 
 	descriptionNull := sql.NullString{}
+	updatedAtNull := sql.NullTime{}
 
 	err := row.Scan(
 		&m.Name,
@@ -133,13 +134,14 @@ func (b Beer) scanRow(row pgx.Row) (model.Beer, error) {
 		&descriptionNull,
 		&m.ID,
 		&m.CreatedAt,
-		&m.UpdatedAt,
+		&updatedAtNull,
 	)
 	if err != nil {
 		return model.Beer{}, err
 	}
 
 	m.Description = descriptionNull.String
+	m.UpdatedAt = updatedAtNull.Time
 
 	return m, nil
 }

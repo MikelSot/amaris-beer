@@ -41,9 +41,10 @@ func (b BeerView) IsHighDemandReached(ctx context.Context, beerID uint) bool {
 	return int64(views) >= int64(b.demandThreshold)
 }
 
-func (b BeerView) PublishHighDemand(ctx context.Context, beerID uint) error {
-	body := strconv.Itoa(int(beerID))
-	if err := b.stream.Publish(ctx, model.NewHighDemand, []byte(body)); err != nil {
+func (b BeerView) PublishHighDemand(ctx context.Context, beer model.Beer) error {
+	beerId := strconv.Itoa(int(beer.ID))
+	currentPrice := fmt.Sprintf("%.2f", beer.Price)
+	if err := b.stream.Publish(ctx, model.NewHighDemand, []byte(beerId), []byte(currentPrice)); err != nil {
 		return fmt.Errorf("beerview.PublishHighDemand(): %w", err)
 	}
 

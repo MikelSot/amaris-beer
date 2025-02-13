@@ -98,7 +98,7 @@ func (b Beer) GetByID(ctx context.Context, ID uint) (model.Beer, error) {
 		return model.Beer{}, fmt.Errorf("beer: %w", err)
 	}
 
-	b.processBeerView(ctx, ID)
+	b.processBeerView(ctx, beer)
 
 	return beer, nil
 }
@@ -156,21 +156,21 @@ func (b Beer) getByName(ctx context.Context, name string) (model.Beer, error) {
 	return beer, nil
 }
 
-func (b Beer) processBeerView(ctx context.Context, beerID uint) {
-	_, err := b.beerView.Increment(ctx, beerID)
+func (b Beer) processBeerView(ctx context.Context, beer model.Beer) {
+	_, err := b.beerView.Increment(ctx, beer.ID)
 	if err != nil {
 		log.Printf("error incrementing beer view: %v", err)
 	}
 
-	if !b.beerView.IsHighDemandReached(ctx, beerID) {
+	if !b.beerView.IsHighDemandReached(ctx, beer.ID) {
 		return
 	}
 
-	if err := b.beerView.PublishHighDemand(ctx, beerID); err != nil {
+	if err := b.beerView.PublishHighDemand(ctx, beer); err != nil {
 		log.Printf("error publishing high demand: %v", err)
 	}
 
-	if err := b.beerView.ResetViewCounter(ctx, beerID); err != nil {
+	if err := b.beerView.ResetViewCounter(ctx, beer.ID); err != nil {
 		log.Printf("error reseting view counter: %v", err)
 	}
 }
